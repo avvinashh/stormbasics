@@ -7,31 +7,29 @@ import org.apache.storm.tuple.Values;
 
 import java.util.Map;
 
-import static java.lang.Thread.*;
+public class SignalSpout extends BaseRichSpout {
 
-public class IntegerSpout extends BaseRichSpout {
-    SpoutOutputCollector spoutOutputCollector;
-    private Integer index=0;
+
+    private SpoutOutputCollector spoutOutputCollector;
+
+    @Override
     public void open(Map map, TopologyContext topologyContext, SpoutOutputCollector spoutOutputCollector) {
-        this.spoutOutputCollector=spoutOutputCollector;
+        this.spoutOutputCollector = spoutOutputCollector;
     }
 
+    @Override
     public void nextTuple() {
-        if(index<100000)
-        {
-            try {
-                sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            this.spoutOutputCollector.emit(new Values(index));
-            index++;
+        try {
+            Thread.sleep(2000);
+            this.spoutOutputCollector.emit("signalstream",new Values(1));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-
     }
 
+    @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declare(new Fields("OutputField"));
+        outputFieldsDeclarer.declareStream("signalstream", new Fields("value"));
     }
 }
